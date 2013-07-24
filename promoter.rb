@@ -53,7 +53,7 @@ BIPARTITE = [ ['siga_one.txt', 'siga_two.txt'] ]
 # The variable below describes the background frequences of nucleotides in order.
 # => 										   A			C				G			T
 BACKGROUND_FREQUENCIES = [0.345, 0.155, 0.155, 0.345]
-TARGETS = infile('targets.txt')
+#TARGETS = infile('targets.txt')
 MAXDIST = 30
 MINDIST = 10
 CUTOFF = 0.05
@@ -88,6 +88,8 @@ def infile(filein)
   end
   return hashmap
 end
+
+
 
 # This function reads a fasta format file, checking if the length of each sequence is uniform.
 #
@@ -180,9 +182,10 @@ end
 def adder(liszt)
 	hash = {}
 	if TARGETS[liszt[0]]["Strand"] == '+'
-		hash["Start"] = TARGETS[line[0]]["Start"].to_i + liszt[2].to_i - 1; hash["End"] = TARGETS[line[0]]["Start"].to_i + liszt[3].to_i - 1; hash["p-value"] = liszt[-1]
+		hash["Start"] = TARGETS[liszt[0]]["Start"].to_i + liszt[2].to_i - 1; hash["End"] = TARGETS[liszt[0]]["Start"].to_i + liszt[3].to_i - 1; hash["p-value"] = liszt[-1]
 	else
-		hash["Start"] = TARGETS[line[0]]["End"].to_i - liszt[3].to_i - 1; hash["End"] = TARGETS[line[0]]["End"].to_i + liszt[2].to_i - 1; hash["p-value"] = liszt[-1]
+		hash["Start"] = TARGETS[liszt[0]]["End"].to_i - liszt[3].to_i - 1; hash["End"] = TARGETS[liszt[0]]["End"].to_i + liszt[2].to_i - 1; hash["p-value"] = liszt[-1]
+	end
 	return hash
 end
 
@@ -224,7 +227,8 @@ def bipartite_merger(bipartite)
 				twokeys = minus
 				start = Array(0..twokeys.size).bsearch {|x| value["Start"] - two[twokeys[x]]["End"] > MAXDIST ? 1 : (value["Start"] - two[twokeys[x]]["End"] < MINDIST ? -1 : (pairs.push([value, two[twokeys[x]]]); names.push(genekey); return 0))}
 				(pairs.push([value, two[twokeys[l]]]); names.push(genekey); l-=1) while (value["Start"] - two[twokeys[l]]["End"] >= MINDIST and value["Start"] - two[twokeys[l]]["End"] <= MAXDIST)
-				(pairs.push([value, two[twokeys[r]]]); names.push(genekey); r+=1) while (value["Start"] - two[twokeys[r]]["End"] >= MINDIST and value["Start"] - two[twokeys[r]]["End"] <= MAXDIST)	
+				(pairs.push([value, two[twokeys[r]]]); names.push(genekey); r+=1) while (value["Start"] - two[twokeys[r]]["End"] >= MINDIST and value["Start"] - two[twokeys[r]]["End"] <= MAXDIST)
+			end	
 		end
 		File.open("#{first.split("_")[0]}.res.txt", 'w') do |file|
 			file.puts("ID\tStart\tEnd\tLeft_p-value\tRight_p-value")
